@@ -238,7 +238,7 @@ var tagBundleModule = angular.module("TagBundleUtil", []).controller
        
         $http.defaults.headers.common = {};
         $http.defaults.headers.common["Content-Type"] = "application/json";
-        $http.defaults.headers.common['Authorization'] = 'dWthdGF5OmJvbGF2ZXJzb24=';
+        $http.defaults.headers.common['Authorization'] = '';
 
         $http.defaults.headers.post = {};
         $http.defaults.headers.put = {};
@@ -419,7 +419,7 @@ tagBundleModule.controller("bookmarksCtrl", ['$scope', 'bookmarkRepository', fun
 
     $http.defaults.headers.common = {};
     $http.defaults.headers.common["Content-Type"] = "application/json";
-    $http.defaults.headers.common['Authorization'] = 'dWthdGF5OmJvbGF2ZXJzb24=';
+    $http.defaults.headers.common['Authorization'] = '';
 
     $http.defaults.headers.post = {};
     $http.defaults.headers.put = {};
