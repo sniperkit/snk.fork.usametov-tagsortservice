@@ -1,0 +1,15 @@
+C:\code\csharp-vs2013\TagSortService\TagSortService\bin\TagSortService.dll.config
+C:\code\csharp-vs2013\TagSortService\TagSortService\bin\TagSortService.dll
+C:\code\csharp-vs2013\TagSortService\TagSortService\bin\TagSortService.pdb
+C:\code\csharp-vs2013\TagSortService\TagSortService\obj\Debug\TagSortService.csprojResolveAssemblyReference.cache
+C:\code\csharp-vs2013\TagSortService\TagSortService\obj\Debug\TagSortService.dll
+C:\code\csharp-vs2013\TagSortService\TagSortService\obj\Debug\TagSortService.pdb
+C:\code\csharp-vs2013\TagSortService\TagSortService\bin\MongoDB.Bson.dll
+C:\code\csharp-vs2013\TagSortService\TagSortService\bin\MongoDB.Driver.Core.dll
+C:\code\csharp-vs2013\TagSortService\TagSortService\bin\MongoDB.Driver.dll
+C:\code\csharp-vs2013\TagSortService\TagSortService\bin\MongoDB.Bson.xml
+C:\code\csharp-vs2013\TagSortService\TagSortService\bin\MongoDB.Driver.xml
+C:\code\csharp-vs2013\TagSortService\TagSortService\bin\Bookmarks.Mongo.Data.dll
+C:\code\csharp-vs2013\TagSortService\TagSortService\bin\Bookmarks.Mongo.Data.pdb
+C:\code\csharp-vs2013\TagSortService\TagSortService\bin\AutoMapper.dll
+C:\code\csharp-vs2013\TagSortService\TagSortService\bin\AutoMapper.xml

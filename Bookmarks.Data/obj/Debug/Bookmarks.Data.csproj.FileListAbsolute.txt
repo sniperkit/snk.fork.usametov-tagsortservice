@@ -1,0 +1,5 @@
+C:\code\csharp-vs2013\TagSortService\Bookmarks.Data\bin\Debug\Bookmarks.Data.dll
+C:\code\csharp-vs2013\TagSortService\Bookmarks.Data\bin\Debug\Bookmarks.Data.pdb
+C:\code\csharp-vs2013\TagSortService\Bookmarks.Data\obj\Debug\Bookmarks.Data.csprojResolveAssemblyReference.cache
+C:\code\csharp-vs2013\TagSortService\Bookmarks.Data\obj\Debug\Bookmarks.Data.dll
+C:\code\csharp-vs2013\TagSortService\Bookmarks.Data\obj\Debug\Bookmarks.Data.pdb

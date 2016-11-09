@@ -1,0 +1,25 @@
+﻿using System;
+using System.IdentityModel.Selectors;
+using System.IdentityModel.Tokens;
+using System.Security.Cryptography;
+using System.ServiceModel;
+using System.Text;
+
+namespace TagSortService
+{
+    public class UserValidator : UserNamePasswordValidator 
+    {
+        public override void Validate(string userName, string password)
+        {
+            var context = new BookmarksContext(Utils.GetConnectionString());
+            var sha = SHA256Managed.Create();
+            var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
+            var hash = Convert.ToBase64String(bytes);
+            var user = context.GetUserByUsernameAndPasswdHash(userName, hash);
+            if(user==null)
+            {
+                throw new SecurityTokenException("User Name and/or Password incorrect...!"); 
+            }
+        }
+    }
+}
