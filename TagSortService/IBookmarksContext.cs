@@ -43,5 +43,7 @@ namespace TagSortService
         IEnumerable<TagBundle> GetTagBundleNames(string bookmarksCollectionId);
 
         IEnumerable<TagCount> CalculateRemainingTermCounts(int bufferSize, string[] excludeTagBundles);
+
+        IEnumerable<TagSortService.Models.Bookmark> BackupBookmarks();
     }
 }

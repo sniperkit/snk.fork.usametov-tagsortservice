@@ -134,5 +134,10 @@ namespace TagSortService
                 ? Context.CalculateRemainingTermCounts(bufferSize, excludeTagBundles)
                 : Context.CalculateRemainingTermCounts(BookmarksContext.TAG_COUNTS_PAGE_SIZE, excludeTagBundles);            
         }
+        
+        public IEnumerable<Bookmark> ExportBookmarks()
+        {
+            return Context.BackupBookmarks();
+        }
     }
 }

@@ -115,5 +115,12 @@ namespace TagSortService
             RequestFormat = WebMessageFormat.Json,
             ResponseFormat = WebMessageFormat.Json)]
         IEnumerable<TagCount> GetAssociatedTerms(string objId, int bufferSize);
+
+        [OperationContract]
+        [WebInvoke(UriTemplate = "bookmarks/backup",
+            Method = "GET",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json)]
+        IEnumerable<Bookmark> ExportBookmarks();
     }           
 }

@@ -323,6 +323,13 @@ namespace BookmarkRepositoryUnitTest
         //    processor.UpdateTagBundleBookmarkCollectionId(bundleId, bookmarkCollectionId);
         //}
 
+        [Test]
+        public void TestBackupBookmarks()
+        {
+            var processor = new BookmarksContext(connectionString);
+            var backup = processor.BackupBookmarks();
+            Assert.IsNotEmpty(backup);
+        }
     }
 }
 

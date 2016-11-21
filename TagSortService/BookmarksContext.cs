@@ -470,6 +470,13 @@ namespace TagSortService
                 .Select(bm => MapperObj.Map<TagSortService.Models.Bookmark>(bm));
         }
 
+        public IEnumerable<TagSortService.Models.Bookmark> BackupBookmarks()
+        {
+            var bookmarks = _database.GetCollection<Bookmarks.Mongo.Data.Bookmark>(BookmarksCollection);
+            return bookmarks.Find(new BsonDocument()).ToList()
+                .Select(bm => MapperObj.Map<TagSortService.Models.Bookmark>(bm));
+        }
+
         public IEnumerable<TagSortService.Models.Bookmark> GetBookmarksByTagBundle
            (Models.TagBundle tagBundle, int? skip, int? take)
         {
