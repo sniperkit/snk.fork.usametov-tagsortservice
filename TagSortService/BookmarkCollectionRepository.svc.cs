@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Configuration;
-using TagSortService.Models;
+using Bookmarks.Common;
 using System.Threading.Tasks;
 using System.ServiceModel.Activation;
 
@@ -94,9 +94,8 @@ namespace TagSortService
         }
 
         public void UpdateExcludeList(TagBundle tagBundle)
-        {
-            var exclTags = tagBundle.ExcludeTags.ToStringArray();
-            Context.UpdateExcludeList(tagBundle.Id, exclTags);
+        {            
+            Context.UpdateExcludeList(tagBundle.Id, tagBundle.ExcludeTags);
         }
 
         public string ConnectionString { 

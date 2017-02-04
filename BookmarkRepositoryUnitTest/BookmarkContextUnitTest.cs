@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TagSortService;
 using System.Configuration;
-using TagSortService.Models;
+using Bookmarks.Common;
 //using Bookmarks.Data;
 
 
@@ -104,9 +104,9 @@ namespace BookmarkRepositoryUnitTest
         {
 
             var processor = new BookmarksContext(connectionString);
-            processor.CreateTagBundle(new TagBundle { Name = name, BookmarksCollectionId = bookmarkCollectionsId });
+            processor.CreateTagBundle(TagBundle.Create(name, bookmarkCollectionsId));
         }
-
+        
         //[TestCase("mstech"
         //        , @"C:\code\csharp6\Tagging-Util\solr_import_util\storage\mstech-top-tags.txt"
         //        , @"C:\code\csharp6\Tagging-Util\solr_import_util\storage\exclude-list4mstech.txt")]
@@ -165,13 +165,13 @@ namespace BookmarkRepositoryUnitTest
             {
                 Name = name
                 ,
-                Tags = new TagCount[] { }
+                Tags = new string[] { }
                 ,
-                ExcludeTags = new TagCount[] { }
+                ExcludeTags = new string[] { }
             };
 
-            tagBundle2Update.Tags = LoadTagBundle(tagBundleFile).Select(t => new TagCount {Tag = t}).ToArray();
-            tagBundle2Update.ExcludeTags = LoadTagBundle(excludeFile).Select(t => new TagCount { Tag = t }).ToArray();
+            tagBundle2Update.Tags = LoadTagBundle(tagBundleFile).ToArray();
+            tagBundle2Update.ExcludeTags = LoadTagBundle(excludeFile).ToArray();
 
             var processor = new BookmarksContext(connectionString);
             processor.UpdateTagBundle(tagBundle2Update);
@@ -191,9 +191,9 @@ namespace BookmarkRepositoryUnitTest
                 ,
                 Name = name
                 ,
-                Tags = tags.Split(',').Select(t => new TagCount {Tag = t}).ToArray()
+                Tags = tags.Split(',').ToArray()
                 ,
-                ExcludeTags = exclTags.Split(',').Select(t => new TagCount { Tag = t }).ToArray()
+                ExcludeTags = exclTags.Split(',').ToArray()
             };            
 
             var processor = new BookmarksContext(connectionString);
@@ -323,7 +323,7 @@ namespace BookmarkRepositoryUnitTest
         //    processor.UpdateTagBundleBookmarkCollectionId(bundleId, bookmarkCollectionId);
         //}
 
-        [Test]
+        //[Test]
         public void TestBackupBookmarks()
         {
             var processor = new BookmarksContext(connectionString);

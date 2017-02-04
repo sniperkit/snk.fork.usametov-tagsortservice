@@ -1,5 +1,5 @@
 ﻿using System.Configuration;
-using TagSortService.Models;
+using Bookmarks.Common;
 using System.Linq;
 
 namespace TagSortService

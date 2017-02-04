@@ -6,7 +6,7 @@ using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Text;
 using System.Threading.Tasks;
-using TagSortService.Models;
+using Bookmarks.Common;
 
 namespace TagSortService
 {

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using TagSortService.Models;
+using Bookmarks.Common;
 
 namespace TagSortService
 {
@@ -44,6 +44,6 @@ namespace TagSortService
 
         IEnumerable<TagCount> CalculateRemainingTermCounts(int bufferSize, string[] excludeTagBundles);
 
-        IEnumerable<TagSortService.Models.Bookmark> BackupBookmarks();
+        IEnumerable<Bookmarks.Common.Bookmark> BackupBookmarks();
     }
 }

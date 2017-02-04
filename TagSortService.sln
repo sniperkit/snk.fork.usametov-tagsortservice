@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{555D71
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bookmarks.Common", "..\..\csharp6\Tagging-Util\Common\Bookmarks.Common.csproj", "{EC9BFCFE-70B5-429B-A540-A3AADC6575E5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{CDEFCA8F-E4D3-4F13-92CE-FE012CD01DCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CDEFCA8F-E4D3-4F13-92CE-FE012CD01DCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CDEFCA8F-E4D3-4F13-92CE-FE012CD01DCC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC9BFCFE-70B5-429B-A540-A3AADC6575E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC9BFCFE-70B5-429B-A540-A3AADC6575E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC9BFCFE-70B5-429B-A540-A3AADC6575E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC9BFCFE-70B5-429B-A540-A3AADC6575E5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

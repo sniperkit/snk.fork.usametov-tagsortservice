@@ -125,11 +125,6 @@
     <Compile Include="BookmarksContext.cs" />
     <Compile Include="IBookmarkCollectionRepository.cs" />
     <Compile Include="IBookmarksContext.cs" />
-    <Compile Include="Models\Bookmark.cs" />
-    <Compile Include="Models\BookmarksCollections.cs" />
-    <Compile Include="Models\TagBundle.cs" />
-    <Compile Include="Models\TagCount.cs" />
-    <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RestAuthorizationManager.cs" />
     <Compile Include="Utils.cs" />
@@ -153,6 +148,10 @@
     <Content Include="web\src\less\variables.less" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\csharp6\Tagging-Util\Common\Bookmarks.Common.csproj">
+      <Project>{ec9bfcfe-70b5-429b-a540-a3aadc6575e5}</Project>
+      <Name>Bookmarks.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Bookmarks.Common\Bookmarks.Mongo.Data.csproj">
       <Project>{917aafd0-6698-4476-93e6-0ddfb7154ca9}</Project>
       <Name>Bookmarks.Mongo.Data</Name>

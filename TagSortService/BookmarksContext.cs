@@ -1,5 +1,5 @@
 ﻿using Bookmarks.Mongo.Data;
-using TagSortService.Models;
+using Bookmarks.Common;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
@@ -66,17 +66,17 @@ namespace TagSortService
 
             var config = new MapperConfiguration(cfg => 
             {
-                cfg.CreateMap<string, TagSortService.Models.TagCount>().ForMember(dest => dest.Tag, opt => opt.MapFrom(s => s));
-                cfg.CreateMap<TagSortService.Models.TagCount, string>().ConvertUsing(src => src.Tag);
+                cfg.CreateMap<string, Bookmarks.Common.TagCount>().ForMember(dest => dest.Tag, opt => opt.MapFrom(s => s));
+                cfg.CreateMap<Bookmarks.Common.TagCount, string>().ConvertUsing(src => src.Tag);
 
-                cfg.CreateMap<Bookmarks.Mongo.Data.TagBundle, TagSortService.Models.TagBundle>();                    
+                cfg.CreateMap<Bookmarks.Mongo.Data.TagBundle, Bookmarks.Common.TagBundle>();                    
 
-                cfg.CreateMap<TagSortService.Models.TagBundle, Bookmarks.Mongo.Data.TagBundle>();
+                cfg.CreateMap<Bookmarks.Common.TagBundle, Bookmarks.Mongo.Data.TagBundle>();
 
-                cfg.CreateMap<Bookmarks.Mongo.Data.BookmarksCollections, TagSortService.Models.BookmarksCollections>();
-                cfg.CreateMap<Bookmarks.Mongo.Data.TagCount, TagSortService.Models.TagCount>();
-                cfg.CreateMap<Bookmarks.Mongo.Data.Bookmark, TagSortService.Models.Bookmark>();
-                cfg.CreateMap<Bookmarks.Mongo.Data.User, TagSortService.Models.User>();
+                cfg.CreateMap<Bookmarks.Mongo.Data.BookmarksCollections, Bookmarks.Common.BookmarksCollections>();
+                cfg.CreateMap<Bookmarks.Mongo.Data.TagCount, Bookmarks.Common.TagCount>();
+                cfg.CreateMap<Bookmarks.Mongo.Data.Bookmark, Bookmarks.Common.Bookmark>();
+                cfg.CreateMap<Bookmarks.Mongo.Data.User, Bookmarks.Common.User>();
             });                            
 
             MapperObj = config.CreateMapper();       
@@ -93,12 +93,12 @@ namespace TagSortService
         /// Calculate term counts
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<TagSortService.Models.TagCount> CalculateTermCounts(int bufferSize = TAG_COUNTS_PAGE_SIZE)
+        public IEnumerable<Bookmarks.Common.TagCount> CalculateTermCounts(int bufferSize = TAG_COUNTS_PAGE_SIZE)
         {
             var bookmarks = _database.GetCollection<BsonDocument>(BookmarksCollection);
             var aggregate = bookmarks.Aggregate(BuildTagCountsPipelineDefinition(0, bufferSize));
 
-            return aggregate.ToList().Select(tc => MapperObj.Map<TagSortService.Models.TagCount>(tc)).ToList();
+            return aggregate.ToList().Select(tc => MapperObj.Map<Bookmarks.Common.TagCount>(tc)).ToList();
         }
 
 
@@ -191,21 +191,21 @@ namespace TagSortService
 
         }
 
-        public IEnumerable<Models.TagCount> GetAssociatedTerms
-                                            (Models.TagBundle tagBundle, int bufferSize)
+        public IEnumerable<Bookmarks.Common.TagCount> GetAssociatedTerms
+                                            (Bookmarks.Common.TagBundle tagBundle, int bufferSize)
         {
             var bookmarks = _database.GetCollection<BsonDocument>(BookmarksCollection);            
 
             var filteredBookmarks = GetBookmarksByTagBundle(tagBundle, (int?)0, (int?)bufferSize);
 
             var tagCounts = filteredBookmarks.SelectMany(b => b.Tags)
-                                    .Where(t => !tagBundle.Tags.ToStringArray().Contains(t)
-                                             && !tagBundle.ExcludeTags.ToStringArray().Contains(t))
-                                    .Select(t => new Models.TagCount { Tag = t, Count = 1 });
+                                    .Where(t => !tagBundle.Tags.Contains(t)
+                                             && !tagBundle.ExcludeTags.Contains(t))
+                                    .Select(t => new Bookmarks.Common.TagCount { Tag = t, Count = 1 });
 
             return tagCounts.GroupBy(tc => tc.Tag)
-                            .Select(tagGrp 
-                                        => new Models.TagCount 
+                            .Select(tagGrp
+                                        => new Bookmarks.Common.TagCount 
                                         {
                                             Tag = tagGrp.Key, Count = tagGrp.Count() 
                                         })
@@ -322,7 +322,7 @@ namespace TagSortService
         }
 
 
-        public void CreateTagBundle(TagSortService.Models.TagBundle tagBundle)
+        public void CreateTagBundle(Bookmarks.Common.TagBundle tagBundle)
         {
             if (tagBundle == null)
                 throw new ArgumentNullException("tagBundle");
@@ -336,21 +336,20 @@ namespace TagSortService
             tagBundles.InsertOne(MapperObj.Map<Bookmarks.Mongo.Data.TagBundle>(tagBundle));
         }
 
-        public void UpdateTagBundle(TagSortService.Models.TagBundle tagBundle)
+        public void UpdateTagBundle(Bookmarks.Common.TagBundle tagBundle)
         {
-
             var tagBundles = _database.GetCollection<Bookmarks.Mongo.Data.TagBundle>(TAG_BUNDLES_COLLECTION);
             var builder = Builders<Bookmarks.Mongo.Data.TagBundle>.Filter;
             var filter = builder.Eq(t => t.Name, tagBundle.Name);
             var update = Builders<Bookmarks.Mongo.Data.TagBundle>.Update
-                .Set(t => t.Tags, tagBundle.Tags.ToStringArray())
-                .Set(t => t.ExcludeTags, tagBundle.ExcludeTags.ToStringArray())
+                .Set(t => t.Tags, tagBundle.Tags)
+                .Set(t => t.ExcludeTags, tagBundle.ExcludeTags)
                 .CurrentDate("lastModified");
 
             tagBundles.UpdateOne(filter, update);
         }
 
-        public void UpdateTagBundleById(TagSortService.Models.TagBundle tagBundle)
+        public void UpdateTagBundleById(Bookmarks.Common.TagBundle tagBundle)
         {
             var tagBundles = _database.GetCollection
                 <Bookmarks.Mongo.Data.TagBundle>(TAG_BUNDLES_COLLECTION);
@@ -359,8 +358,8 @@ namespace TagSortService
             var filter = builder.Eq(t => t.Id, tagBundle.Id);
             var update = Builders<Bookmarks.Mongo.Data.TagBundle>.Update
                 //.Set(t => t.Name, tagBundle.Name)//no ui for this
-                .Set(t => t.Tags, tagBundle.Tags.ToStringArray())
-                .Set(t => t.ExcludeTags, tagBundle.ExcludeTags.ToStringArray())                
+                .Set(t => t.Tags, tagBundle.Tags)
+                .Set(t => t.ExcludeTags, tagBundle.ExcludeTags)                
                 .CurrentDate("lastModified");
 
             tagBundles.UpdateOne(filter, update);
@@ -371,7 +370,7 @@ namespace TagSortService
         /// </summary>
         /// <param name="name">if this is null or empty then get all</param>
         /// <returns></returns>
-        public IEnumerable<TagSortService.Models.TagBundle> GetTagBundles(string name)
+        public IEnumerable<Bookmarks.Common.TagBundle> GetTagBundles(string name)
         {
             IEnumerable<Bookmarks.Mongo.Data.TagBundle> result = null;
             var tagBundles = _database.GetCollection<Bookmarks.Mongo.Data.TagBundle>(TAG_BUNDLES_COLLECTION);
@@ -387,10 +386,10 @@ namespace TagSortService
                 result = tagBundles.Find(filter).ToList();
             }
 
-            return result.Select(tb=>MapperObj.Map<TagSortService.Models.TagBundle>(tb));
+            return result.Select(tb => MapperObj.Map<Bookmarks.Common.TagBundle>(tb));
         }
 
-        public TagSortService.Models.TagBundle GetTagBundleById(string objId)
+        public Bookmarks.Common.TagBundle GetTagBundleById(string objId)
         {
             if (string.IsNullOrEmpty(objId))
                 throw new ArgumentNullException("objId");
@@ -403,16 +402,16 @@ namespace TagSortService
 
             var resultTask = tagBundles.Find(filter).FirstAsync();
 
-            var bundle = MapperObj.Map<TagSortService.Models.TagBundle>(resultTask.Result);            
+            var bundle = MapperObj.Map<Bookmarks.Common.TagBundle>(resultTask.Result);            
             
-            bundle.Tags = CleanupTagCounts(bundle.Tags);
+            //bundle.Tags = CleanupTagCounts(bundle.Tags);
 
-            bundle.ExcludeTags = CleanupTagCounts(bundle.ExcludeTags);
+            //bundle.ExcludeTags = CleanupTagCounts(bundle.ExcludeTags);
 
             return bundle;
         }
 
-        private Models.TagCount[] CleanupTagCounts(Models.TagCount[] tagCounts)
+        private Bookmarks.Common.TagCount[] CleanupTagCounts(Bookmarks.Common.TagCount[] tagCounts)
         {
             var tags = tagCounts.Distinct().ToArray();
             foreach (var tc in tags)
@@ -423,7 +422,7 @@ namespace TagSortService
             return tags;
         }
 
-        public IEnumerable<TagSortService.Models.TagCount> GetNextMostFrequentTags(string tagBundleId, string[] excludeTagBundles, int limitTermCounts = TAG_COUNTS_PAGE_SIZE)
+        public IEnumerable<Bookmarks.Common.TagCount> GetNextMostFrequentTags(string tagBundleId, string[] excludeTagBundles, int limitTermCounts = TAG_COUNTS_PAGE_SIZE)
         {
             var tagCounts = CalculateTermCounts(limitTermCounts);
             //get tag bundle by name
@@ -432,7 +431,7 @@ namespace TagSortService
             if (tagBundle == null)
                 throw new ApplicationException("tagBundle not found");
 
-            IEnumerable<string> excludedTags = ExtractExcludeTags(excludeTagBundles, tagBundle);
+            IEnumerable<string> excludedTags = ExtractExcludeTags(excludeTagBundles ?? new string[0], tagBundle);
 
             var filteredTags = tagCounts.Where(tc => !excludedTags.Contains(tc.Tag))
                                         .OrderByDescending(tc => tc.Count).ToList();
@@ -440,20 +439,20 @@ namespace TagSortService
             return filteredTags;
         }
 
-        internal IEnumerable<string> ExtractExcludeTags(string[] excludeTagBundles, Models.TagBundle tagBundle)
+        internal IEnumerable<string> ExtractExcludeTags(string[] excludeTagBundles, Bookmarks.Common.TagBundle tagBundle)
         {
             var exclTags = excludeTagBundles.SelectMany(ext => GetTagBundles(ext))
-                                           .SelectMany(b=>b.Tags.Select(t=>t.Tag)).ToArray();
+                                           .SelectMany(b=>b.Tags).ToArray();
 
-            string[] excludeTags = tagBundle == null ? new string[0] : tagBundle.ExcludeTags.ToStringArray();
-            string[] tags        = tagBundle == null ? new string[0] : tagBundle.Tags.ToStringArray();
+            string[] excludeTags = tagBundle == null ? new string[0] : tagBundle.ExcludeTags;
+            string[] tags        = tagBundle == null ? new string[0] : tagBundle.Tags;
 
             return exclTags.Union(excludeTags)
                            .Union(tags);
         }
 
 
-        public IEnumerable<TagSortService.Models.Bookmark> GetBookmarksByTagBundle
+        public IEnumerable<Bookmarks.Common.Bookmark> GetBookmarksByTagBundle
             (string tagBundleName, int? skip, int? take)
         {
             //get tag bundle by name
@@ -464,31 +463,31 @@ namespace TagSortService
             //should be in tagBundle.Tags
             //HACK!
             var filterDef = string.Format("{{ 'Tags': {{$elemMatch: {{$in: ['{0}'] }} }} }}"
-                , string.Join("','", tagBundle.Tags.ToStringArray()));
+                , string.Join("','", tagBundle.Tags));
 
             return FilterBookmarks(filterDef, skip, take).ToList()
-                .Select(bm => MapperObj.Map<TagSortService.Models.Bookmark>(bm));
+                .Select(bm => MapperObj.Map<Bookmarks.Common.Bookmark>(bm));
         }
 
-        public IEnumerable<TagSortService.Models.Bookmark> BackupBookmarks()
+        public IEnumerable<Bookmarks.Common.Bookmark> BackupBookmarks()
         {
-            var bookmarks = _database.GetCollection<Bookmarks.Mongo.Data.Bookmark>(BookmarksCollection);
+            var bookmarks = _database.GetCollection<Bookmarks.Mongo.Data.Bookmark>(BookmarksCollection);            
             return bookmarks.Find(new BsonDocument()).ToList()
-                .Select(bm => MapperObj.Map<TagSortService.Models.Bookmark>(bm));
+                .Select(bm => MapperObj.Map<Bookmarks.Common.Bookmark>(bm));
         }
 
-        public IEnumerable<TagSortService.Models.Bookmark> GetBookmarksByTagBundle
-           (Models.TagBundle tagBundle, int? skip, int? take)
+        public IEnumerable<Bookmarks.Common.Bookmark> GetBookmarksByTagBundle
+           (Bookmarks.Common.TagBundle tagBundle, int? skip, int? take)
         {
             if (tagBundle == null)
                 throw new ApplicationException("tagBundle not found");
             //should be in tagBundle.Tags
             //HACK!
             var filterDef = string.Format("{{ 'Tags': {{$elemMatch: {{$in: ['{0}'] }} }} }}"
-                , string.Join("','", tagBundle.Tags.ToStringArray()));
+                , string.Join("','", tagBundle.Tags));
 
             return FilterBookmarks(filterDef, skip, take).ToList()
-                .Select(bm => MapperObj.Map<TagSortService.Models.Bookmark>(bm));
+                .Select(bm => MapperObj.Map<Bookmarks.Common.Bookmark>(bm));
         }
                 
 
@@ -498,22 +497,22 @@ namespace TagSortService
             return bookmarks.Find(filterDef).Skip(skip).Limit(take);
         }
 
-        public TagSortService.Models.User GetUserByUsernameAndPasswdHash(string userName, string passwordHash)
+        public Bookmarks.Common.User GetUserByUsernameAndPasswdHash(string userName, string passwordHash)
         {
 
             var users = _database.GetCollection<Bookmarks.Mongo.Data.User>(USERS_COLLECTION);
 
-            return MapperObj.Map<TagSortService.Models.User>
+            return MapperObj.Map<Bookmarks.Common.User>
                 (users.Find(u => u.Name == userName && u.PasswordHash == passwordHash).FirstOrDefault());
         }
 
-        public IEnumerable<TagSortService.Models.BookmarksCollections> GetBookmarksCollections()
+        public IEnumerable<Bookmarks.Common.BookmarksCollections> GetBookmarksCollections()
         {
             var bookmarksCollections = _database.GetCollection
                 <Bookmarks.Mongo.Data.BookmarksCollections>(BOOKMARKS_COLLECTIONS);
 
             return bookmarksCollections.Find(new BsonDocument()).ToList()
-                .Select(bmc => MapperObj.Map<TagSortService.Models.BookmarksCollections>(bmc));
+                .Select(bmc => MapperObj.Map<Bookmarks.Common.BookmarksCollections>(bmc));
         }
 
         public void CreateBookmarksCollection(string name)
@@ -562,7 +561,7 @@ namespace TagSortService
         }
 
 
-        public IEnumerable<TagSortService.Models.TagBundle> GetTagBundleNames(string bookmarksCollectionId)
+        public IEnumerable<Bookmarks.Common.TagBundle> GetTagBundleNames(string bookmarksCollectionId)
         {
             var tagBundles = _database.GetCollection
                 <Bookmarks.Mongo.Data.TagBundle>(TAG_BUNDLES_COLLECTION);
@@ -581,10 +580,10 @@ namespace TagSortService
                          .Include("Name")).ToList();
 
             return result.Select(t=>
-                new TagSortService.Models.TagBundle
+                new Bookmarks.Common.TagBundle
                     { Id = t.GetValue("_id").ToString()
                     , Name = t.GetValue("Name").AsString
-                    , BookmarksCollectionId = bookmarksCollectionId}).ToList();
+                    , BookmarkCollectionId = bookmarksCollectionId}).ToList();
         }
 
         /// <summary>
@@ -623,7 +622,7 @@ namespace TagSortService
         }
 
 
-        public IEnumerable<Models.TagCount> CalculateRemainingTermCounts(int bufferSize, string[] excludeTagBundles)
+        public IEnumerable<Bookmarks.Common.TagCount> CalculateRemainingTermCounts(int bufferSize, string[] excludeTagBundles)
         {
             if (excludeTagBundles == null)
                 throw new ArgumentNullException("excludeTagBundles");
@@ -631,7 +630,7 @@ namespace TagSortService
             var bookmarks = _database.GetCollection<BsonDocument>(BookmarksCollection);
             var aggregate = bookmarks.Aggregate(BuildTagCountsPipelineDefinition(0, bufferSize));
 
-            var tagCounts = aggregate.ToList().Select(tc => MapperObj.Map<TagSortService.Models.TagCount>(tc)).ToList();
+            var tagCounts = aggregate.ToList().Select(tc => MapperObj.Map<Bookmarks.Common.TagCount>(tc)).ToList();
 
             IEnumerable<string> excludedTags = ExtractExcludeTags(excludeTagBundles, null);
 
