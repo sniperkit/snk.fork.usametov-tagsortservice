@@ -6,8 +6,6 @@ using System.Linq;
 using TagSortService;
 using System.Configuration;
 using Bookmarks.Common;
-//using Bookmarks.Data;
-
 
 namespace BookmarkRepositoryUnitTest
 {
