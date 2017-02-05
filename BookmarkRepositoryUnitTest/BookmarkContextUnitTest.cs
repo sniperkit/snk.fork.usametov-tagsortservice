@@ -37,7 +37,7 @@ namespace BookmarkRepositoryUnitTest
         }
 
         [SetUp]
-        public void SetupConnection()
+        public void SetupContext()
         {
             string appConfigFilePath =
                 @"C:\code\csharp-vs2013\TagSortService\BookmarkRepositoryUnitTest\app.config";
