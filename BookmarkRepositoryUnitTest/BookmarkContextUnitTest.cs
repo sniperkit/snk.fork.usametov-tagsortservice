@@ -14,6 +14,11 @@ namespace BookmarkRepositoryUnitTest
     {
         string connectionString;
 
+        IBookmarksContext context;
+        IBookmarksContext Context
+        {
+            get{ return context;}
+        }
         /// <summary>
         /// Loads tags from flat file. Removes quotes, trimming whitespaces and converts everything to lower case        
         /// </summary>
@@ -32,7 +37,7 @@ namespace BookmarkRepositoryUnitTest
         }
 
         [SetUp]
-        public void SetupConnectionString()
+        public void SetupConnection()
         {
             string appConfigFilePath =
                 @"C:\code\csharp-vs2013\TagSortService\BookmarkRepositoryUnitTest\app.config";
@@ -49,14 +54,16 @@ namespace BookmarkRepositoryUnitTest
 
             connectionString = section.ConnectionStrings[0].ConnectionString;
 
+            if (context == null)
+                context = new Bookmarks.Mongo.Data.BookmarksContext(connectionString);
+                
         }
 
         //[TestCase]
         public void TestGetMostFrequentTags()
         {
-            var processor = new BookmarksContext(connectionString);
-
-            var processedTags = processor.CalculateTermCounts();
+            var processedTags = Context.CalculateTermCounts
+                                        (Bookmarks.Mongo.Data.BookmarksContext.TAG_COUNTS_PAGE_SIZE);
 
             Assert.IsNotEmpty(processedTags);            
         }
@@ -64,33 +71,32 @@ namespace BookmarkRepositoryUnitTest
         //[TestCase("571db1d1083989dcf1e6e923")]
         public void TestGetNextMostFrequentTags(string tagBundleId)
         {
-            var processor = new BookmarksContext(connectionString);
+            var nextMostFreqTags = Context.GetNextMostFrequentTags
+                                            (tagBundleId, null
+                                           , Bookmarks.Mongo.Data.BookmarksContext.TAG_COUNTS_PAGE_SIZE);
 
-            var nextMostFreqTags = processor.GetNextMostFrequentTags(tagBundleId, null);
             Assert.IsNotEmpty(nextMostFreqTags);
         }
         
         //[TestCase("mstech,security","571db1d1083989dcf1e6e923")]        
         public void TestExtractExcludeTags(string testBundleNames, string bundleId) 
-        {
-            var processor = new BookmarksContext(connectionString);
-            var tagBundle = processor.GetTagBundleById("571db1d1083989dcf1e6e923");
+        {            
+            var tagBundle = Context.GetTagBundleById("571db1d1083989dcf1e6e923");
 
-            var excludeTags = processor.ExtractExcludeTags
-                (testBundleNames.Split
-                                (new char[]{','},StringSplitOptions.RemoveEmptyEntries)
-                , tagBundle);
+            var excludeTags = Context.ExtractExcludeTags
+                                        (testBundleNames.Split
+                                                        (new char[]{','}, StringSplitOptions.RemoveEmptyEntries)
+                                        , tagBundle);
 
             Assert.IsNotEmpty(excludeTags);
         }
 
         //[TestCase("","571db1d1083989dcf1e6e923")]        
         public void TestNothing2Extract(string testBundleNames, string bundleId)
-        {
-            var processor = new BookmarksContext(connectionString);
-            var tagBundle = processor.GetTagBundleById("571db1d1083989dcf1e6e923");
+        {            
+            var tagBundle = Context.GetTagBundleById("571db1d1083989dcf1e6e923");
 
-            var excludeTags = processor.ExtractExcludeTags
+            var excludeTags = Context.ExtractExcludeTags
                 (testBundleNames.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                 , tagBundle);
 
@@ -100,9 +106,7 @@ namespace BookmarkRepositoryUnitTest
         //[TestCase("trading", "57e13f7e84e39a17d49bb198")]
         public void TestCreateTagBundle(string name, string bookmarkCollectionsId)
         {
-
-            var processor = new BookmarksContext(connectionString);
-            processor.CreateTagBundle(TagBundle.Create(name, bookmarkCollectionsId));
+            Context.CreateTagBundle(TagBundle.Create(name, bookmarkCollectionsId));
         }
         
         //[TestCase("mstech"
@@ -171,8 +175,7 @@ namespace BookmarkRepositoryUnitTest
             tagBundle2Update.Tags = LoadTagBundle(tagBundleFile).ToArray();
             tagBundle2Update.ExcludeTags = LoadTagBundle(excludeFile).ToArray();
 
-            var processor = new BookmarksContext(connectionString);
-            processor.UpdateTagBundle(tagBundle2Update);
+            Context.UpdateTagBundle(tagBundle2Update);
         }
 
         //[TestCase("580f053784e39a3724a7ad13", "trading", "test1,test2", "xTest1,xTest2")]
@@ -192,19 +195,16 @@ namespace BookmarkRepositoryUnitTest
                 Tags = tags.Split(',').ToArray()
                 ,
                 ExcludeTags = exclTags.Split(',').ToArray()
-            };            
+            };
 
-            var processor = new BookmarksContext(connectionString);
-            processor.UpdateTagBundleById(tagBundle2Update);
+            Context.UpdateTagBundleById(tagBundle2Update);
         }
 
         //[TestCase(null)]
         //[TestCase("webdev")]
         public void TestGetTagBundles(string name)
         {
-
-            var processor = new BookmarksContext(connectionString);
-            Assert.IsNotEmpty(processor.GetTagBundles(name));
+            Assert.IsNotEmpty(Context.GetTagBundles(name));
         }
 
         //[TestCase("571da189083989dcf1e6e920")]
@@ -212,24 +212,21 @@ namespace BookmarkRepositoryUnitTest
         //[TestCase("580f842d84e39a25c4945986")]
         public void TestGetTagBundleById(string objId)
         {
-            var processor = new BookmarksContext(connectionString);
-            var bundle = processor.GetTagBundleById(objId);
+            var bundle = Context.GetTagBundleById(objId);
             Assert.IsNotNull(bundle);
         }
 
         //[TestCase("mstech")]
         public void TestGetBookmarksByTagBundle(string tagBundleName)
         {
-            var processor = new BookmarksContext(connectionString);
-            var bookmarks = processor.GetBookmarksByTagBundle(tagBundleName, null, null);
+            var bookmarks = Context.GetBookmarksByTagBundle(tagBundleName, null, null);
             Assert.IsNotEmpty(bookmarks);
         }
 
         //[TestCase("security")]
         public void TestGetBookmarksByTagBundleLimited(string tagBundleName)
         {
-            var processor = new BookmarksContext(connectionString);
-            var bookmarks = processor.GetBookmarksByTagBundle(tagBundleName, 10, 50);
+            var bookmarks = Context.GetBookmarksByTagBundle(tagBundleName, 10, 50);
             Assert.IsNotEmpty(bookmarks);
         }
 
@@ -256,33 +253,27 @@ namespace BookmarkRepositoryUnitTest
         //[TestCase("ukatay", "6pgMQ16OGh2fMZk4dkkfn0uuY85O4IftT1sIL69B3v4=")]
         public void TestGetUserByUsernameAndPasswdHash(string userName, string passwordHash)
         {
-            var processor = new BookmarksContext(connectionString);
-            var user = processor.GetUserByUsernameAndPasswdHash(userName, passwordHash);
+            var user = Context.GetUserByUsernameAndPasswdHash(userName, passwordHash);
             Assert.IsNotNull(user);
         }
 
         //[TestCase("bookmarks")]
         public void TestCreateBookmarksCollection(string name)
         {
-            var processor = new BookmarksContext(connectionString);
-
-            processor.CreateBookmarksCollection(name);
+            Context.CreateBookmarksCollection(name);
         }
 
         //[TestCase]
         public void TestGetBookmarksCollections()
         {
-            var processor = new BookmarksContext(connectionString);
-
-            Assert.IsNotEmpty(processor.GetBookmarksCollections());
+            Assert.IsNotEmpty(Context.GetBookmarksCollections());
         }
 
         //[TestCase("571da189083989dcf1e6e920")]
         public void TestGetAssociatedTerms(string tagBundleId)
         {
-            var processor = new BookmarksContext(connectionString);
-            var tagBundle = processor.GetTagBundleById(tagBundleId);
-            var associatedTags = processor.GetAssociatedTerms(tagBundle, 1500);
+            var tagBundle = Context.GetTagBundleById(tagBundleId);
+            var associatedTags = Context.GetAssociatedTerms(tagBundle, 1500);
 
             Assert.IsNotEmpty(associatedTags);
         }
@@ -291,8 +282,7 @@ namespace BookmarkRepositoryUnitTest
         //[TestCase("57e13f7e84e39a17d49bb198")]
         public void TestGetTagBundleNames(string bookmarksCollectionId)
         {
-            var processor = new BookmarksContext(connectionString);
-            var bundles = processor.GetTagBundleNames(bookmarksCollectionId);
+            var bundles = Context.GetTagBundleNames(bookmarksCollectionId);
             Assert.IsNotEmpty(bundles);
             Assert.IsTrue(bundles.Count() > 3);
         }
@@ -324,8 +314,7 @@ namespace BookmarkRepositoryUnitTest
         //[Test]
         public void TestBackupBookmarks()
         {
-            var processor = new BookmarksContext(connectionString);
-            var backup = processor.BackupBookmarks();
+            var backup = Context.BackupBookmarks();
             Assert.IsNotEmpty(backup);
         }
     }

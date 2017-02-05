@@ -13,6 +13,18 @@ namespace TagSortService
 {
     public class RestAuthorizationManager : ServiceAuthorizationManager
     {
+        IBookmarksContext context;
+        IBookmarksContext Context
+        {
+            get
+            {
+                if (context == null)
+                    context = new Bookmarks.Mongo.Data.BookmarksContext
+                                                        (Utils.GetConnectionString());
+
+                return context;
+            }
+        }
         /// <summary>
         /// auth
         /// </summary>
@@ -48,9 +60,8 @@ namespace TagSortService
         }
 
         private bool CredsAreValid(User user)
-        {
-            var context = new BookmarksContext(Utils.GetConnectionString());
-            if(context.GetUserByUsernameAndPasswdHash
+        {            
+            if(Context.GetUserByUsernameAndPasswdHash
                 (user.Name, user.PasswordHash) == null)
                 return false;
 

@@ -20,7 +20,7 @@ namespace TagSortService
             get 
             { 
                 if(context==null)
-                    context = new BookmarksContext(ConnectionString);
+                    context = new Bookmarks.Mongo.Data.BookmarksContext(ConnectionString);
 
                 return context;
             }
@@ -35,8 +35,8 @@ namespace TagSortService
         public IEnumerable<TagCount> CalculateTermCounts(int bufferSize)
         {
             return bufferSize > 0 
-                ? Context.CalculateTermCounts(bufferSize) 
-                : Context.CalculateTermCounts(BookmarksContext.TAG_COUNTS_PAGE_SIZE);            
+                ? Context.CalculateTermCounts(bufferSize)
+                : Context.CalculateTermCounts(Bookmarks.Mongo.Data.BookmarksContext.TAG_COUNTS_PAGE_SIZE);            
         }
         
         public void CreateBookmarksCollection(string name)
@@ -131,7 +131,8 @@ namespace TagSortService
 
             return bufferSize > 0
                 ? Context.CalculateRemainingTermCounts(bufferSize, excludeTagBundles)
-                : Context.CalculateRemainingTermCounts(BookmarksContext.TAG_COUNTS_PAGE_SIZE, excludeTagBundles);            
+                : Context.CalculateRemainingTermCounts(Bookmarks.Mongo.Data.BookmarksContext.TAG_COUNTS_PAGE_SIZE
+                                                        , excludeTagBundles);            
         }
         
         public IEnumerable<Bookmark> ExportBookmarks()
