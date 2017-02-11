@@ -5,9 +5,9 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Configuration;
-using Bookmarks.Common;
 using System.Threading.Tasks;
 using System.ServiceModel.Activation;
+using TagSortService.ViewModels;
 
 namespace TagSortService
 {
@@ -15,8 +15,9 @@ namespace TagSortService
     [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Required)]
     public class BookmarkCollectionRepository : IBookmarkCollectionRepository
     {
-        IBookmarksContext context;
-        IBookmarksContext Context {
+        Bookmarks.Common.IBookmarksContext context;
+        Bookmarks.Common.IBookmarksContext Context
+        {
             get 
             { 
                 if(context==null)
@@ -29,16 +30,35 @@ namespace TagSortService
 
         public IEnumerable<BookmarksCollections> GetBookmarkCollections()
         {
-            return Context.GetBookmarksCollections();
+            return Context.GetBookmarksCollections().Select
+                (bc => new BookmarksCollections
+                {
+                    Id = bc.Id
+                    ,
+                    Name = bc.Name
+                });
         }
         
         public IEnumerable<TagCount> CalculateTermCounts(int bufferSize)
         {
-            return bufferSize > 0 
-                ? Context.CalculateTermCounts(bufferSize)
-                : Context.CalculateTermCounts(Bookmarks.Mongo.Data.BookmarksContext.TAG_COUNTS_PAGE_SIZE);            
+            return bufferSize > 0
+                ? MapTagCounts(Context.CalculateTermCounts(bufferSize))
+                : MapTagCounts(Context.CalculateTermCounts(Bookmarks.Mongo.Data.BookmarksContext.TAG_COUNTS_PAGE_SIZE));                
         }
-        
+
+        public IEnumerable<TagCount> MapTagCounts(IEnumerable<Bookmarks.Common.TagCount> tagCounts)
+        {
+            return tagCounts.Select
+                        (
+                            tc => new TagCount
+                            {
+                                Count = tc.Count
+                                ,
+                                Tag = tc.Tag
+                            }
+                        );
+        }
+
         public void CreateBookmarksCollection(string name)
         {        
             Context.CreateBookmarksCollection(name);
@@ -46,19 +66,42 @@ namespace TagSortService
 
 
         public void CreateTagBundle(TagBundle tagBundle)
-        {            
-            Context.CreateTagBundle(tagBundle);
+        {
+            Context.CreateTagBundle(new Bookmarks.Common.TagBundle
+            {
+                Name = tagBundle.Name
+                ,
+                Tags = tagBundle.Tags.Select(t => t.Tag).ToArray(),
+                ExcludeTags = tagBundle.ExcludeTags.Select(t => t.Tag).ToArray()
+            });
         }
 
         public IEnumerable<Bookmark> GetBookmarksByTagBundle(string tagBundleName, int skip, int take)
         {
-            return Context.GetBookmarksByTagBundle
-                (tagBundleName, skip, take);
+            return MapBookmarks(Context.GetBookmarksByTagBundle(tagBundleName, skip, take));
+        }
+
+        private IEnumerable<Bookmark> MapBookmarks(IEnumerable<Bookmarks.Common.Bookmark> bookmarks)
+        {
+            return bookmarks.Select(b => new Bookmark
+                {
+                    Id = b.Id
+                    ,
+                    LinkUrl = b.LinkUrl
+                    ,
+                    LinkText = b.LinkText
+                    ,
+                    Description = b.Description
+                    ,
+                    Tags = b.Tags
+                    ,
+                    AddDate = b.AddDate
+                });
         }
 
         public IEnumerable<Bookmark> GetBookmarksByTagBundle(string tagBundleName, int? skip, int? take)
         {
-            return Context.GetBookmarksByTagBundle(tagBundleName, skip, take);
+            return MapBookmarks(Context.GetBookmarksByTagBundle(tagBundleName, skip, take));
         }
                 
         public IEnumerable<TagCount> GetNextMostFrequentTags
@@ -69,33 +112,55 @@ namespace TagSortService
                 excludeTagBundles = excludeTagBundleNames.Split
                     (new char[]{',', '\n','\r'}, StringSplitOptions.RemoveEmptyEntries);
 
-            return Context.GetNextMostFrequentTags
-                (tagBundleId, excludeTagBundles, limitTermCounts);
+            return MapTagCounts(Context.GetNextMostFrequentTags(tagBundleId, excludeTagBundles, limitTermCounts));
         }
 
-        public TagBundle GetTagBundleById(string objId)
+        public ViewModels.TagBundle GetTagBundleById(string objId)
         {
-            return Context.GetTagBundleById(objId);
+            if (string.IsNullOrEmpty(objId) || objId.Equals("undefined"))
+                throw new ArgumentNullException("objId");
+
+            var bundle = Context.GetTagBundleById(objId);
+
+            return new ViewModels.TagBundle
+                                    {
+                                        Name = bundle.Name
+                                        ,
+                                        Id = bundle.Id
+                                        ,
+                                        Tags = MapTags(bundle.Tags)
+                                        ,
+                                        ExcludeTags = MapTags(bundle.ExcludeTags)
+                                        ,
+                                        ExcludeTagBundles = bundle.ExcludeTagBundles
+                                    };
         }
 
-        //public IEnumerable<TagBundle> GetTagBundles(string name, string bookmarksCollectionId)
-        //{no need
-        //    return Context.GetTagBundles(name); 
-        //}
-                
-        //public void UpdateTagBundle(TagBundle tagBundle)
-        //{
-        //    Context.UpdateTagBundle(tagBundle);
-        //}
+        private TagSortService.ViewModels.TagCount[] MapTags(string[] tags)
+        {
+            return tags.Select(t => new TagSortService.ViewModels.TagCount { Tag = t, Count = -1 }).ToArray();
+        }
 
         public void UpdateTagBundleById(TagBundle tagBundle)
         {
-            Context.UpdateTagBundleById(tagBundle);
+            Context.UpdateTagBundleById(
+                new Bookmarks.Common.TagBundle
+            {
+                Id = tagBundle.Id
+                ,
+                Name = tagBundle.Name
+                ,
+                Tags = tagBundle.Tags.Select(t => t.Tag).ToArray()
+                ,
+                ExcludeTags = tagBundle.ExcludeTags.Select(t => t.Tag).ToArray()
+                ,
+                ExcludeTagBundles = tagBundle.ExcludeTagBundles
+            });
         }
 
         public void UpdateExcludeList(TagBundle tagBundle)
         {            
-            Context.UpdateExcludeList(tagBundle.Id, tagBundle.ExcludeTags);
+            Context.UpdateExcludeList(tagBundle.Id, tagBundle.ExcludeTags.Select(t=>t.Tag).ToArray());
         }
 
         public string ConnectionString { 
@@ -107,13 +172,17 @@ namespace TagSortService
         public IEnumerable<TagCount> GetAssociatedTerms(string objId, int bufferSize)
         {
             var tagBundle = Context.GetTagBundleById(objId);
-            return Context.GetAssociatedTerms(tagBundle, bufferSize);
+            return MapTagCounts(Context.GetAssociatedTerms(tagBundle, bufferSize));
         }
-
 
         public IEnumerable<TagBundle> GetTagBundleNames(string bookmarksCollectionId)
         {
-            return Context.GetTagBundleNames(bookmarksCollectionId);
+            return Context.GetTagBundleNames(bookmarksCollectionId).Select(tb => new TagBundle
+            {
+                Id = tb.Id
+                ,
+                Name = tb.Name                
+            });
         }
         
         public void UpdateTagBundleNameById(TagBundle tagBundle)
@@ -130,14 +199,21 @@ namespace TagSortService
                     (new char[]{',', '\n','\r'}, StringSplitOptions.RemoveEmptyEntries);
 
             return bufferSize > 0
-                ? Context.CalculateRemainingTermCounts(bufferSize, excludeTagBundles)
-                : Context.CalculateRemainingTermCounts(Bookmarks.Mongo.Data.BookmarksContext.TAG_COUNTS_PAGE_SIZE
-                                                        , excludeTagBundles);            
+                ? MapTagCounts(Context.CalculateRemainingTermCounts(bufferSize, excludeTagBundles))
+                : MapTagCounts(Context.CalculateRemainingTermCounts
+                                        (Bookmarks.Mongo.Data.BookmarksContext.TAG_COUNTS_PAGE_SIZE
+                                       , excludeTagBundles));            
         }
         
         public IEnumerable<Bookmark> ExportBookmarks()
         {
-            return Context.BackupBookmarks();
+            return MapBookmarks(Context.BackupBookmarks());
+        }
+
+
+        public void UpdateExcludeTagBundlesList(TagBundle tagBundle)
+        {
+            Context.UpdateExcludeTagBundlesList(tagBundle.Id, tagBundle.ExcludeTagBundles);
         }
     }
 }

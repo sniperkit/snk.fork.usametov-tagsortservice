@@ -87,7 +87,8 @@ var tagBundleModule = angular.module("TagBundleUtil", []).controller
             resolvePromise(tagRepository.saveTagBundle
                             ($scope.selectedTagBundleId, 
                              $scope.topTags,
-                             $scope.exclTags)
+                             $scope.exclTags,
+                             $scope.exclTagBundles.split(','))
                            , function (response) {
                                console.log("SaveTagBundleAndExcludeList, response status", response.status);
                            });
@@ -215,8 +216,8 @@ var tagBundleModule = angular.module("TagBundleUtil", []).controller
             resolvePromise(promise, function (response) {
                 $scope.topTags = response.data.Tags;
                 $scope.exclTags = response.data.ExcludeTags;
-                
-                //console.log("scope", $scope);
+                $scope.exclTagBundles = response.data.ExcludeTagBundles.join(',');
+                console.log("scope", $scope);
                 $scope.$apply();
             });
         }
@@ -238,7 +239,7 @@ var tagBundleModule = angular.module("TagBundleUtil", []).controller
        
         $http.defaults.headers.common = {};
         $http.defaults.headers.common["Content-Type"] = "application/json";
-        $http.defaults.headers.common['Authorization'] = '';
+        $http.defaults.headers.common['Authorization'] = 'dWthdGF5OmJvbGF2ZXJzb24=';
 
         $http.defaults.headers.post = {};
         $http.defaults.headers.put = {};
@@ -309,14 +310,15 @@ var tagBundleModule = angular.module("TagBundleUtil", []).controller
             return promise;
         }
         
-        var saveTagBundle = function (tagBundleId, topTags, exclTags) {
+        var saveTagBundle = function (tagBundleId, topTags, exclTags, exclTagBundles) {
                 
             var tagBundle = {
                 "tagBundle":
                    {
                        "Id": tagBundleId
                      , "Tags": topTags
-                     , "ExcludeTags": exclTags                 
+                     , "ExcludeTags": exclTags     
+                     , "ExcludeTagBundles": exclTagBundles  
                    }
             };
 
@@ -419,7 +421,7 @@ tagBundleModule.controller("bookmarksCtrl", ['$scope', 'bookmarkRepository', fun
 
     $http.defaults.headers.common = {};
     $http.defaults.headers.common["Content-Type"] = "application/json";
-    $http.defaults.headers.common['Authorization'] = '';
+    $http.defaults.headers.common['Authorization'] = 'dWthdGF5OmJvbGF2ZXJzb24=';
 
     $http.defaults.headers.post = {};
     $http.defaults.headers.put = {};

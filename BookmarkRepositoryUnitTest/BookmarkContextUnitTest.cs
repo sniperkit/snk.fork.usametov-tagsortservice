@@ -106,7 +106,7 @@ namespace BookmarkRepositoryUnitTest
         //[TestCase("trading", "57e13f7e84e39a17d49bb198")]
         public void TestCreateTagBundle(string name, string bookmarkCollectionsId)
         {
-            Context.CreateTagBundle(TagBundle.Create(name, bookmarkCollectionsId));
+            Context.CreateTagBundle(TagBundle.Create(name, new string[]{ bookmarkCollectionsId }));
         }
         
         //[TestCase("mstech"
@@ -287,29 +287,37 @@ namespace BookmarkRepositoryUnitTest
             Assert.IsTrue(bundles.Count() > 3);
         }
 
+        
+        //[TestCase("581e138784e39a31585db8f9", "57e13f7e84e39a17d49bb198")]
+        //[TestCase("5820977a84e39a09805b0282", "57e13f7e84e39a17d49bb198")]
+        //[TestCase("580f8c5984e39a3028f4e743", "57e13f7e84e39a17d49bb198")]
+        //[TestCase("571dbfec083989dcf1e6e931", "57e13f7e84e39a17d49bb198")]
+        //[TestCase("571db334083989dcf1e6e925", "57e13f7e84e39a17d49bb198")]                
+        //[TestCase("571dbfec083989dcf1e6e931", "57e13f7e84e39a17d49bb198")]        
         //[TestCase("571db1d1083989dcf1e6e923", "57e13f7e84e39a17d49bb198")]
+        //[TestCase("571db10d083989dcf1e6e922", "57e13f7e84e39a17d49bb198")]
         //[TestCase("571da189083989dcf1e6e920", "57e13f7e84e39a17d49bb198")]
-        //[TestCase("571da189083989dcf1e6e921", "57e13f7e84e39a17d49bb198")]
-        //[TestCase("571da189083989dcf1e6e922", "57e13f7e84e39a17d49bb198")]
-        //[TestCase("571da189083989dcf1e6e924", "57e13f7e84e39a17d49bb198")]
+        //[TestCase("571db019083989dcf1e6e921", "57e13f7e84e39a17d49bb198")]  
+        //[TestCase("581e082584e39a31585db8f8", "57e13f7e84e39a17d49bb198")]  
+        //[TestCase("571db2a3083989dcf1e6e924", "57e13f7e84e39a17d49bb198")]
         //[TestCase("571da189083989dcf1e6e925", "57e13f7e84e39a17d49bb198")]
-        //[TestCase("571da189083989dcf1e6e926", "57e13f7e84e39a17d49bb198")]
-        //[TestCase("571da189083989dcf1e6e927", "57e13f7e84e39a17d49bb198")]
-        //[TestCase("571da189083989dcf1e6e928", "57e13f7e84e39a17d49bb198")]
-        //[TestCase("571da189083989dcf1e6e929", "57e13f7e84e39a17d49bb198")]
-        //[TestCase("571da189083989dcf1e6e92a", "57e13f7e84e39a17d49bb198")]
-        //[TestCase("571da189083989dcf1e6e92d", "57e13f7e84e39a17d49bb198")]
-        //[TestCase("571da189083989dcf1e6e92e", "57e13f7e84e39a17d49bb198")]
-        //[TestCase("571da189083989dcf1e6e92f", "57e13f7e84e39a17d49bb198")]
-        //[TestCase("571da189083989dcf1e6e931", "57e13f7e84e39a17d49bb198")]
-        //[TestCase("571da189083989dcf1e6e932", "57e13f7e84e39a17d49bb198")]
-        //[TestCase("571da189083989dcf1e6e930", "57e13f7e84e39a17d49bb198")]        
-        //public void TestUpdateTagBundleBookmarksCollectionId(string bundleId
-        //                              , string bookmarkCollectionId)
-        //{   
-        //    var processor = new BookmarksContext(connectionString);
-        //    processor.UpdateTagBundleBookmarkCollectionId(bundleId, bookmarkCollectionId);
-        //}
+        //[TestCase("571db452083989dcf1e6e926", "57e13f7e84e39a17d49bb198")]
+        //[TestCase("571db58d083989dcf1e6e927", "57e13f7e84e39a17d49bb198")]
+        //[TestCase("571db629083989dcf1e6e928", "57e13f7e84e39a17d49bb198")]
+        //[TestCase("571db6d5083989dcf1e6e929", "57e13f7e84e39a17d49bb198")]
+        //[TestCase("571db75a083989dcf1e6e92a", "57e13f7e84e39a17d49bb198")]
+        //[TestCase("571db82c083989dcf1e6e92d", "57e13f7e84e39a17d49bb198")]
+        //[TestCase("571dbbd6083989dcf1e6e92e", "57e13f7e84e39a17d49bb198")]
+        //[TestCase("571dbc70083989dcf1e6e92f", "57e13f7e84e39a17d49bb198")]
+        //[TestCase("571dbd55083989dcf1e6e930", "57e13f7e84e39a17d49bb198")]
+        //[TestCase("571dc0c5083989dcf1e6e932", "57e13f7e84e39a17d49bb198")]
+        //[TestCase("580f053784e39a3724a7ad13", "57e13f7e84e39a17d49bb198")]
+        //[TestCase("580f842d84e39a25c4945986", "57e13f7e84e39a17d49bb198")]
+        public void TestUpdateTagBundleBookmarksCollectionId(string bundleId
+                                      , string bookmarkCollectionId)
+        {
+            Context.UpdateBookmarkCollectionId(bundleId, bookmarkCollectionId);
+        }
 
         //[Test]
         public void TestBackupBookmarks()

@@ -119,6 +119,11 @@
       <DependentUpon>BookmarkCollectionRepository.svc</DependentUpon>
     </Compile>
     <Compile Include="IBookmarkCollectionRepository.cs" />
+    <Compile Include="ViewModels\Bookmark.cs" />
+    <Compile Include="ViewModels\BookmarksCollections.cs" />
+    <Compile Include="ViewModels\TagBundle.cs" />
+    <Compile Include="ViewModels\TagCount.cs" />
+    <Compile Include="ViewModels\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RestAuthorizationManager.cs" />
     <Compile Include="Utils.cs" />
@@ -146,7 +151,7 @@
       <Project>{ec9bfcfe-70b5-429b-a540-a3aadc6575e5}</Project>
       <Name>Bookmarks.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Bookmarks.Common\Bookmarks.Mongo.Data.csproj">
+    <ProjectReference Include="..\Bookmarks.Mongo.Data\Bookmarks.Mongo.Data.csproj">
       <Project>{917aafd0-6698-4476-93e6-0ddfb7154ca9}</Project>
       <Name>Bookmarks.Mongo.Data</Name>
     </ProjectReference>

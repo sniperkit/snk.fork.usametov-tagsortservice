@@ -6,7 +6,7 @@ using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Text;
 using System.Threading.Tasks;
-using Bookmarks.Common;
+using TagSortService.ViewModels;
 
 namespace TagSortService
 {
@@ -74,7 +74,7 @@ namespace TagSortService
             "/tagBundle/?id={objId}",
             RequestFormat = WebMessageFormat.Json,
             ResponseFormat = WebMessageFormat.Json)]
-        TagBundle GetTagBundleById(string objId);
+        ViewModels.TagBundle GetTagBundleById(string objId);
 
                 
         //[OperationContract]
@@ -108,6 +108,14 @@ namespace TagSortService
             RequestFormat = WebMessageFormat.Json,
             ResponseFormat = WebMessageFormat.Json)]
         void UpdateExcludeList(TagBundle tagBundle);
+
+        [OperationContract]
+        [WebInvoke(UriTemplate = "/tagBundle/UpdateExcludeTagBundlesList",
+            Method = "POST",
+            BodyStyle = WebMessageBodyStyle.WrappedRequest,
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json)]
+        void UpdateExcludeTagBundlesList(TagBundle tagBundle);
 
         [OperationContract]
         [WebInvoke(UriTemplate = "/AssociatedTerms/?tagBundleId={objId}&bufferSize={bufferSize}",
