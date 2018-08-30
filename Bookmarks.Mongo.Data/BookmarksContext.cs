@@ -1,3 +1,8 @@
+/*
+Sniperkit-Bot
+- Status: analyzed
+*/
+
 ﻿using Bookmarks.Mongo.Data;
 using Bookmarks.Common;
 using MongoDB.Bson;

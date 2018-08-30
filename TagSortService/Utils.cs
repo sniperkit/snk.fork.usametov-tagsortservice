@@ -1,3 +1,8 @@
+/*
+Sniperkit-Bot
+- Status: analyzed
+*/
+
 ﻿using System.Configuration;
 using Bookmarks.Common;
 using System.Linq;

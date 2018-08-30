@@ -1,3 +1,8 @@
+/*
+Sniperkit-Bot
+- Status: analyzed
+*/
+
 // Karma configuration
 // Generated on Sat Oct 08 2016 21:35:55 GMT+0600 (Central Asia Standard Time)
 

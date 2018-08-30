@@ -1,3 +1,8 @@
+/*
+Sniperkit-Bot
+- Status: analyzed
+*/
+
 
 var tagBundleModule = angular.module("TagBundleUtil", []).controller
     ("tagBundleCtrl", ['$scope', '$location', '$window', 'tagRepository'
